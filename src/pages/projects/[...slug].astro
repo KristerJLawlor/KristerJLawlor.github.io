@@ -1,0 +1,152 @@
+---
+import { type CollectionEntry, getCollection, render } from 'astro:content';
+import FormattedDate from '../../components/FormattedDate.astro';
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { Image } from 'astro:assets';
+
+export async function getStaticPaths() {
+	const projects = await getCollection('projects');
+	return projects.map((project) => ({
+		params: { slug: project.id },
+		props: project,
+	}));
+}
+type Props = CollectionEntry<'projects'>;
+
+const project = Astro.props;
+const { Content } = await render(project);
+const { title, description, pubDate, updatedDate, heroImage, url, githubUrl, tags } = project.data;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+		<style>
+			main {
+				width: calc(100% - 2em);
+				max-width: 100%;
+				margin: 0;
+			}
+			.hero-image {
+				width: 100%;
+			}
+			.hero-image img {
+				display: block;
+				margin: 0 auto;
+				border-radius: 12px;
+				box-shadow: var(--box-shadow);
+			}
+			.prose {
+				width: 720px;
+				max-width: calc(100% - 2em);
+				margin: auto;
+				padding: 1em;
+				color: rgb(var(--gray-dark));
+			}
+			.title {
+				margin-bottom: 1em;
+				padding: 1em 0;
+				text-align: center;
+				line-height: 1;
+			}
+			.title h1 {
+				margin: 0 0 0.5em 0;
+			}
+			.meta {
+				display: flex;
+				justify-content: center;
+				gap: 1rem;
+				flex-wrap: wrap;
+				color: rgb(var(--gray));
+				font-size: 0.9rem;
+			}
+			.tags {
+				display: flex;
+				justify-content: center;
+				flex-wrap: wrap;
+				gap: 0.4rem;
+				margin-top: 0.75rem;
+			}
+			.tag {
+				background: rgb(var(--gray-light));
+				border-radius: 4px;
+				padding: 0.2rem 0.5rem;
+				font-size: 0.8rem;
+				color: rgb(var(--gray-dark));
+			}
+			.project-links {
+				display: flex;
+				justify-content: center;
+				gap: 1rem;
+				margin-top: 1rem;
+			}
+			.project-links a {
+				display: inline-block;
+				padding: 0.5rem 1.25rem;
+				border-radius: 6px;
+				text-decoration: none;
+				font-size: 0.9rem;
+				font-weight: 600;
+			}
+			.btn-primary {
+				background: rgb(var(--accent));
+				color: white;
+			}
+			.btn-secondary {
+				border: 1px solid rgb(var(--accent));
+				color: rgb(var(--accent));
+			}
+			.btn-primary:hover,
+			.btn-secondary:hover {
+				opacity: 0.85;
+			}
+			.last-updated {
+				font-style: italic;
+			}
+			hr {
+				border-top: 1px solid rgb(var(--gray-light));
+				margin: 1rem 0;
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<article>
+				<div class="hero-image">
+					{heroImage && <Image width={1020} height={510} src={heroImage} alt={title} />}
+				</div>
+				<div class="prose">
+					<div class="title">
+						<div class="meta">
+							<FormattedDate date={pubDate} />
+							{updatedDate && (
+								<span class="last-updated">
+									Updated: <FormattedDate date={updatedDate} />
+								</span>
+							)}
+						</div>
+						<h1>{title}</h1>
+						{tags.length > 0 && (
+							<div class="tags">
+								{tags.map((tag) => <span class="tag">{tag}</span>)}
+							</div>
+						)}
+						{(url || githubUrl) && (
+							<div class="project-links">
+								{url && <a href={url} target="_blank" rel="noopener" class="btn-primary">Live site ↗</a>}
+								{githubUrl && <a href={githubUrl} target="_blank" rel="noopener" class="btn-secondary">GitHub ↗</a>}
+							</div>
+						)}
+						<hr />
+					</div>
+					<Content />
+				</div>
+			</article>
+		</main>
+		<Footer />
+	</body>
+</html>
