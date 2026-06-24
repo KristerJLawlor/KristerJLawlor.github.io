@@ -1,6 +1,6 @@
 ---
 title: 'Wildfire Tracker'
-description: 'A web app that visualizes active wildfires using data from NASA\'s EONET API.'
+description: "A web app that visualizes active wildfires using data from NASA's EONET API."
 pubDate: 2025-06-18
 githubUrl: 'https://github.com/KristerJLawlor/wildfire-tracker'
 tags: ['JavaScript', 'NASA API', 'Data Visualization', 'Web Development']
