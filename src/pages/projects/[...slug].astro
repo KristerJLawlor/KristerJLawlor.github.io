@@ -18,6 +18,9 @@ type Props = CollectionEntry<'projects'>;
 const project = Astro.props;
 const { Content } = await render(project);
 const { title, description, pubDate, updatedDate, heroImage, url, githubUrl, tags } = project.data;
+
+const devlogPosts = (await getCollection('blog', ({ data }) => data.project === project.id))
+	.sort((a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf());
 ---
 
 <!doctype html>
@@ -110,6 +113,47 @@ const { title, description, pubDate, updatedDate, heroImage, url, githubUrl, tag
 				border-top: 1px solid rgb(var(--gray-light));
 				margin: 1rem 0;
 			}
+			.devlog {
+				width: 720px;
+				max-width: calc(100% - 2em);
+				margin: 2rem auto;
+				padding: 0 1em;
+			}
+			.devlog h2 {
+				font-size: 1.25rem;
+				margin-bottom: 1rem;
+				padding-bottom: 0.5rem;
+				border-bottom: 1px solid rgb(var(--gray-light));
+			}
+			.devlog-list {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+				display: flex;
+				flex-direction: column;
+				gap: 0.25rem;
+			}
+			.devlog-list li a {
+				display: flex;
+				justify-content: space-between;
+				align-items: baseline;
+				gap: 1rem;
+				padding: 0.5rem 0;
+				text-decoration: none;
+				color: rgb(var(--black));
+			}
+			.devlog-list li a:hover .devlog-title {
+				color: rgb(var(--accent));
+			}
+			.devlog-title {
+				font-weight: 600;
+				transition: color 0.2s;
+			}
+			.devlog-date {
+				color: rgb(var(--gray));
+				font-size: 0.875rem;
+				white-space: nowrap;
+			}
 		</style>
 	</head>
 	<body>
@@ -146,6 +190,24 @@ const { title, description, pubDate, updatedDate, heroImage, url, githubUrl, tag
 					<Content />
 				</div>
 			</article>
+
+			{devlogPosts.length > 0 && (
+				<div class="devlog">
+					<h2>Devlog</h2>
+					<ul class="devlog-list">
+						{devlogPosts.map((post) => (
+							<li>
+								<a href={`/blog/${post.id}/`}>
+									<span class="devlog-title">{post.data.title}</span>
+									<span class="devlog-date">
+										<FormattedDate date={post.data.pubDate} />
+									</span>
+								</a>
+							</li>
+						))}
+					</ul>
+				</div>
+			)}
 		</main>
 		<Footer />
 	</body>
